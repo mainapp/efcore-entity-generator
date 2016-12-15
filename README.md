@@ -1,0 +1,1 @@
+# efcore-entity-generator
