@@ -1,0 +1,15 @@
+department: 
+  parent: 
+  rel:    
+  fields:
+    name: string
+
+user:
+  parent:
+  rel:
+    one_to_many: {department: 'dept_id'}
+  fields:
+    name: string
+    age: int
+
+
