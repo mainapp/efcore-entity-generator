@@ -1,0 +1,32 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.DotNet.ProjectModel.Resolution;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+
+namespace YourNamespace
+{
+    public class YourDbContext
+    {
+        public YourDbContext(DbContextOptions options)
+                    : base(options)
+        {
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            {% for rel in rels %}
+            {{rel}}
+            {% endfor %}
+        }
+
+
+        {% for entity in entities %}
+        public DbSet<{{entity}}> {{entity}}s { get; set; }
+        {% endfor %}
+
+    }
+}

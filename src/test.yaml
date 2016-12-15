@@ -1,15 +1,22 @@
-department: 
-  parent: 
-  rel:    
+Department: 
+  super: 
+  many: [User]
   fields:
-    name: string
+    Name: string
+    Id: int
+  attr:
+    Name: MaxLength(40)
+  index: [Name, Id]
 
-user:
-  parent:
-  rel:
-    one_to_many: {department: 'dept_id'}
+User:
+  super:
+  one: [Department]
   fields:
-    name: string
-    age: int
+    Id: int
+    Name: string
+    Age: int
+    DepartmentId: int
+  attr:
+    Name: MaxLength(40)
 
 
