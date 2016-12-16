@@ -1,0 +1,2 @@
+builder.Entity<{{entity_name}}>()
+                .HasIndex(index => new { {% for idx in index -%} {% if loop.last %}index.{{idx}} {% else %} index.{{idx}}, {% endif %} {%- endfor %} });

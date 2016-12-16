@@ -18,6 +18,10 @@ namespace YourNamespace
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            {% for idx in index %}
+            {{idx}}
+            {% endfor %}
+
             {% for rel in rels %}
             {{rel}}
             {% endfor %}

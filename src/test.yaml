@@ -20,3 +20,9 @@ User:
     Name: MaxLength(40)
 
 
+Blog:
+  fields:
+    Id: int
+    Context: string
+
+
