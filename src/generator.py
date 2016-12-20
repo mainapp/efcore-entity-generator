@@ -1,6 +1,12 @@
-import sys, getopt
-from yaml import load
+import sys, getopt, re, yaml
 from jinja2 import Environment, FileSystemLoader
+
+from collections import OrderedDict
+
+yaml.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+    lambda loader, node: OrderedDict(loader.construct_pairs(node)))
+
+
 env = Environment(loader=FileSystemLoader('template'))
 
 class_template = env.get_template('class.template')
@@ -41,10 +47,10 @@ def main(argv):
             inputfile = arg      
 
     fo = open(inputfile, 'r')
-    doc = load(fo)
+    doc = yaml.load(fo)
 
     entity_list = []
-    many_list = []
+    foreign_list = []
     index_list = []
     entity_name_list = []
 
@@ -59,14 +65,10 @@ def main(argv):
         attr = []
         if 'attr' in entity:
             attr = entity['attr']
-        
-        many = []
-        if 'many' in entity:
-            many = entity['many']
 
-        one = []
-        if 'one' in entity:
-            one = entity['one']
+        foreign = []
+        if 'foreign' in entity:
+            foreign = entity['foreign']
 
         parent = ''
         if 'super' in entity:
@@ -83,20 +85,16 @@ def main(argv):
                 if len(item) > 0:
                     item[0]['attr'] = entity['attr'][field_name]
 
-        # one relation proccess
-        for rel in one:
-            fields.append( dict(type=rel, name=rel, attr='') )
-
-            with_many = None
-            ret = entity_hasmany(rel, entity_name)
-            if ret :
-                with_many = '{0}s'.format(entity_name)
-            many_rel_str = many_template.render(entity_name=entity_name, has_one=rel, with_many=with_many)
-            many_list.append(many_rel_str)
-
-        # many relation proccess
-        for rel in many:
-            fields.append( dict(type='List<{0}>'.format(rel), name='{0}s'.format(rel), attr=''))
+        # foreign relation proccess
+        if foreign is not None:
+            for fk in foreign:
+                with_many = None
+                if fk is not None:
+                    result = re.findall('[A-z,0-9]+', foreign[fk])
+                    if len(result) == 3:
+                        with_many = result[2]
+                    many_rel_str = many_template.render(entity_name=entity_name, has_foreign=fk, has_foreign_id=result[0], with_many=with_many)
+                    foreign_list.append(many_rel_str)
 
         #index proccess
         if 'index' in entity and entity['index'] is not None:
@@ -114,7 +112,7 @@ def main(argv):
     entity_file.close()
     #print(entity_all_str)
 
-    ctx_all_str = dbctx_template.render(rels=many_list, index=index_list, entities=entity_name_list)
+    ctx_all_str = dbctx_template.render(rels=foreign_list, index=index_list, entities=entity_name_list)
     ctx_file = open('DbContext.cs', 'w')
     ctx_file.write(ctx_all_str)
     ctx_file.close()

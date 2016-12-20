@@ -1,28 +1,37 @@
 Department: 
-  super: 
-  many: [User]
   fields:
-    Name: string
     Id: int
+    Name: string
+    Users: List<User>
+    Blogs: List<Blog>
   attr:
     Name: MaxLength(40)
   index: [Name, Id]
 
 User:
-  super:
-  one: [Department]
+  foreign:
+    Department: DepartmentId=>Department.Users
   fields:
     Id: int
     Name: string
     Age: int
     DepartmentId: int
+    Department: Department
+    Blogs: List<Blog>
   attr:
     Name: MaxLength(40)
 
 
 Blog:
+  foreign:
+    Sender: SenderId=>User.Blogs
+    Department: DepartmentId
   fields:
     Id: int
     Context: string
+    SenderId: string
+    Sender: User
+    DepartmentId: int
+    Department: Department
 
 

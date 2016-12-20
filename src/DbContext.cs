@@ -26,6 +26,18 @@ namespace YourNamespace
             
             builder.Entity<User>()
                 .HasOne(p => p.Department)
+                .WithMany(b => b.Users)
+                .HasForeignKey(p => p.DepartmentId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            builder.Entity<Blog>()
+                .HasOne(p => p.Sender)
+                .WithMany(b => b.Blogs)
+                .HasForeignKey(p => p.SenderId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            builder.Entity<Blog>()
+                .HasOne(p => p.Department)
                 .WithMany()
                 .HasForeignKey(p => p.DepartmentId)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -34,11 +46,11 @@ namespace YourNamespace
 
 
         
+        public DbSet<Department> Departments { get; set; }
+        
         public DbSet<User> Users { get; set; }
         
         public DbSet<Blog> Blogs { get; set; }
-        
-        public DbSet<Department> Departments { get; set; }
         
 
     }

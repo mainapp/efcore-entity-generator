@@ -10,38 +10,50 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 namespace YourNamespace
 {
     
-    public class User 
+    public class Department 
     {
         
-        public int DepartmentId { get; set; }
-        
-        public int Age { get; set; }
+        public int Id { get; set; }
         [MaxLength(40)]
         public string Name { get; set; }
         
+        public List<User> Users { get; set; }
+        
+        public List<Blog> Blogs { get; set; }
+        
+    }
+    
+    public class User 
+    {
+        
         public int Id { get; set; }
+        [MaxLength(40)]
+        public string Name { get; set; }
+        
+        public int Age { get; set; }
+        
+        public int DepartmentId { get; set; }
         
         public Department Department { get; set; }
+        
+        public List<Blog> Blogs { get; set; }
         
     }
     
     public class Blog 
     {
         
+        public int Id { get; set; }
+        
         public string Context { get; set; }
         
-        public int Id { get; set; }
+        public string SenderId { get; set; }
         
-    }
-    
-    public class Department 
-    {
-        [MaxLength(40)]
-        public string Name { get; set; }
+        public User Sender { get; set; }
         
-        public int Id { get; set; }
+        public int DepartmentId { get; set; }
         
-        public List<User> Users { get; set; }
+        public Department Department { get; set; }
         
     }
     

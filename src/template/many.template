@@ -1,9 +1,9 @@
 builder.Entity<{{entity_name}}>()
-                .HasOne(p => p.{{has_one}})
+                .HasOne(p => p.{{has_foreign}})
                 {% if with_many -%}
                 .WithMany(b => b.{{with_many}})
                 {%- else -%}
                 .WithMany()
                 {%- endif %}
-                .HasForeignKey(p => p.{{has_one}}Id)
+                .HasForeignKey(p => p.{{has_foreign_id}})
                 .OnDelete(DeleteBehavior.Cascade);
