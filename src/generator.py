@@ -107,16 +107,18 @@ def main(argv):
         entity_list.append(entity_class_str)
 
     entity_all_str = entity_template.render(entities=entity_list)
-    entity_file = open('Entities.cs', 'w')
+    entity_file = open('MyEntities.cs', 'w')
     entity_file.write(entity_all_str)
     entity_file.close()
     #print(entity_all_str)
 
     ctx_all_str = dbctx_template.render(rels=foreign_list, index=index_list, entities=entity_name_list)
-    ctx_file = open('DbContext.cs', 'w')
+    ctx_file = open('MyDbContext.cs', 'w')
     ctx_file.write(ctx_all_str)
     ctx_file.close()
     #print(ctx_all_str)
+
+print("OK")
     
 
 

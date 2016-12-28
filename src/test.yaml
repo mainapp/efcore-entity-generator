@@ -2,36 +2,105 @@ Department:
   fields:
     Id: int
     Name: string
-    Users: List<User>
-    Blogs: List<Blog>
+    SortOrder: int
+    Users: List<ApplicationUser>
+    TargetGroups: List<TargetGroup>
   attr:
     Name: MaxLength(40)
-  index: [Name, Id]
+  index: [Name]
 
-User:
+
+ApplicationUser:
+  super: IdentityUser  
+  fields:
+    RealName: string
+    IsRoot: bool
+    IsManager: bool
+    DepartmentId: int
+    Department: Department    
   foreign:
-    Department: DepartmentId=>Department.Users
+    Department: DepartmentId=>Department.Users    
+  attr:
+    RealName: MaxLength(40)
+
+
+Indicator:
   fields:
     Id: int
     Name: string
-    Age: int
-    DepartmentId: int
-    Department: Department
-    Blogs: List<Blog>
+    IsManualInput: bool
+    ExternalCode: string
+    ExternalSystemName: string
   attr:
     Name: MaxLength(40)
+    ExternalCode: MaxLength(80)
+    ExternalSystemName: MaxLength(20)
 
 
-Blog:
-  foreign:
-    Sender: SenderId=>User.Blogs
-    Department: DepartmentId
+IndicatorsGroup:
   fields:
     Id: int
-    Context: string
-    SenderId: string
-    Sender: User
+    Name: string   
+    SortOrder: int
+    BeginDate: datetime
+    EndDate: datetime
+    Indicators: List<TargetGroup>
+    MainUserGroupId: int
+    MainUsers: IndicatorsRelatedUserGroup
+    RelatedUserGroupId: int
+    RelatedUsers: IndicatorsRelatedUserGroup
+  attr:
+    Name: MaxLength(40)
+  foreign:
+    MainUsers: MainUserGroupId=>IndicatorsRelatedUserGroup
+    RelatedUsers: RelatedUserGroupId=>IndicatorsRelatedUserGroup
+
+
+IndicatorsRelatedUserGroup:
+  fields:
+    Id: int
+    Name: string    
+    GroupUsers: List<GroupUser>
+  attr:
+    Name: MaxLength(20)
+  index: [Name]
+
+
+
+GroupUser:
+  fields:
+    Id: int
+    SortOrder: int
+    UserId: string
+    User: ApplicationUser
+    GroupId: int
+    Group: IndicatorsRelatedUserGroup
+  foreign:
+    User: UserId=>ApplicationUser
+    Group: GroupId=>IndicatorsRelatedUserGroup.GroupUsers
+  attr:
+    GroupName: MaxLength(20)
+
+
+
+TargetGroup:
+  fields:
+    Id: int
+    SortOrder: int
+    TargetValue: string
+    CurrentValue: string
+    AlertValue: string
+    AlertEnabled: bool
+    BeginDate: datetime
+    EndDate: datetime
+    IndicatorId: int
+    Indicator: Indicator
     DepartmentId: int
     Department: Department
-
-
+  foreign:
+    Indicator: IndicatorId=>Indicator
+    Department: DepartmentId=>Department.TargetGroups
+  attr:
+    TargetValue: MaxLength(40)
+    CurrentValue: MaxLength(40)
+    AlertValue: MaxLength(40)

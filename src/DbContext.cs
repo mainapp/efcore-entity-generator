@@ -20,25 +20,52 @@ namespace YourNamespace
             base.OnModelCreating(builder);
             
             builder.Entity<Department>()
-                .HasIndex(index => new {  index.Name, index.Id  });
+                .HasIndex(index => new { index.Name  });
+            
+            builder.Entity<IndicatorsRelatedUserGroup>()
+                .HasIndex(index => new { index.Name  });
             
 
             
-            builder.Entity<User>()
+            builder.Entity<ApplicationUser>()
                 .HasOne(p => p.Department)
                 .WithMany(b => b.Users)
                 .HasForeignKey(p => p.DepartmentId)
                 .OnDelete(DeleteBehavior.Cascade);
             
-            builder.Entity<Blog>()
-                .HasOne(p => p.Sender)
-                .WithMany(b => b.Blogs)
-                .HasForeignKey(p => p.SenderId)
+            builder.Entity<IndicatorsGroup>()
+                .HasOne(p => p.MainUsers)
+                .WithMany()
+                .HasForeignKey(p => p.MainUserGroupId)
                 .OnDelete(DeleteBehavior.Cascade);
             
-            builder.Entity<Blog>()
-                .HasOne(p => p.Department)
+            builder.Entity<IndicatorsGroup>()
+                .HasOne(p => p.RelatedUsers)
                 .WithMany()
+                .HasForeignKey(p => p.RelatedUserGroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            builder.Entity<GroupUser>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            builder.Entity<GroupUser>()
+                .HasOne(p => p.Group)
+                .WithMany(b => b.GroupUsers)
+                .HasForeignKey(p => p.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            builder.Entity<TargetGroup>()
+                .HasOne(p => p.Indicator)
+                .WithMany()
+                .HasForeignKey(p => p.IndicatorId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            builder.Entity<TargetGroup>()
+                .HasOne(p => p.Department)
+                .WithMany(b => b.TargetGroups)
                 .HasForeignKey(p => p.DepartmentId)
                 .OnDelete(DeleteBehavior.Cascade);
             
@@ -48,9 +75,17 @@ namespace YourNamespace
         
         public DbSet<Department> Departments { get; set; }
         
-        public DbSet<User> Users { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         
-        public DbSet<Blog> Blogs { get; set; }
+        public DbSet<Indicator> Indicators { get; set; }
+        
+        public DbSet<IndicatorsGroup> IndicatorsGroups { get; set; }
+        
+        public DbSet<IndicatorsRelatedUserGroup> IndicatorsRelatedUserGroups { get; set; }
+        
+        public DbSet<GroupUser> GroupUsers { get; set; }
+        
+        public DbSet<TargetGroup> TargetGroups { get; set; }
         
 
     }

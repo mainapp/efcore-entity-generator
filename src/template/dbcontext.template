@@ -6,13 +6,18 @@ using Microsoft.DotNet.ProjectModel.Resolution;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace YourNamespace
+namespace MyNamespace
 {
-    public class YourDbContext
+    public class MyDbContext
     {
-        public YourDbContext(DbContextOptions options)
+        public MyDbContext(DbContextOptions options)
                     : base(options)
         {
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseMySQL(@"Server=192.168.1.1;Port=3306;Database=test;Uid=root;Pwd=root;Charset=utf8;");
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -33,4 +38,18 @@ namespace YourNamespace
         {% endfor %}
 
     }
+
+    public static class MyDbContextFactory
+    {
+        public static MyDbContext Create()
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<MyDbContext>();
+            optionsBuilder.UseMySQL(@"Server=192.168.1.1;Port=3306;Database=test;Uid=root;Pwd=root;Charset=utf8;");
+
+            var context = new MyDbContext(optionsBuilder.Options);
+            context.Database.EnsureCreated();
+
+            return context;
+        }
+    }    
 }
