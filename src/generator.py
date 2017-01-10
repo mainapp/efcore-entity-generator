@@ -1,10 +1,11 @@
-import sys, getopt, re, yaml
+import sys, getopt, re #, yaml
 from jinja2 import Environment, FileSystemLoader
+import ruamel.yaml
 
 from collections import OrderedDict
 
-yaml.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-    lambda loader, node: OrderedDict(loader.construct_pairs(node)))
+# yaml.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+#     lambda loader, node: OrderedDict(loader.construct_pairs(node)))
 
 
 env = Environment(loader=FileSystemLoader('template'))
@@ -46,8 +47,8 @@ def main(argv):
         elif opt in ("-i"):
             inputfile = arg      
 
-    fo = open(inputfile, 'r')
-    doc = yaml.load(fo)
+    fo = open(inputfile, 'r', encoding='utf-8')
+    doc = ruamel.yaml.load(fo, ruamel.yaml.RoundTripLoader)
 
     entity_list = []
     foreign_list = []
@@ -76,7 +77,12 @@ def main(argv):
 
         fields = []
         for field_name in entity['fields']:
-            fields.append( dict(type=field[field_name], name=field_name, attr='') )
+            comment = ''            
+            if field_name in field.ca.items:
+                comment = field.ca.items[field_name][2].value
+            comment = comment.replace('#','')            
+            comment = comment.replace('\n','')
+            fields.append( dict(type=field[field_name], name=field_name, attr='', comment=comment) )
         
         # attribute proccess
         if 'attr' in entity:
@@ -107,13 +113,13 @@ def main(argv):
         entity_list.append(entity_class_str)
 
     entity_all_str = entity_template.render(entities=entity_list)
-    entity_file = open('MyEntities.cs', 'w')
+    entity_file = open('MyEntities.cs', 'w', encoding='utf-8')
     entity_file.write(entity_all_str)
     entity_file.close()
     #print(entity_all_str)
 
     ctx_all_str = dbctx_template.render(rels=foreign_list, index=index_list, entities=entity_name_list)
-    ctx_file = open('MyDbContext.cs', 'w')
+    ctx_file = open('MyDbContext.cs', 'w', encoding='utf-8')
     ctx_file.write(ctx_all_str)
     ctx_file.close()
     #print(ctx_all_str)

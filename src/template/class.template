@@ -1,10 +1,11 @@
-public class {{entity_name}} {{entity_parent}}
+public partial class {{entity_name}} {{entity_parent}}
     {
         {% for field in fields -%}
         {% if field['attr'] != '' -%}
         
         [{{field['attr']}}]
         {%- endif %}
+        // {{field['comment']}}
         public {{field['type']}} {{field['name']}} { get; set; }
         {% endfor %}
     }
