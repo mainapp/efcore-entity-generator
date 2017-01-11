@@ -2,6 +2,7 @@ import sys, getopt, re #, yaml
 from jinja2 import Environment, FileSystemLoader
 import ruamel.yaml
 
+
 from collections import OrderedDict
 
 # yaml.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
@@ -80,8 +81,7 @@ def main(argv):
             comment = ''            
             if field_name in field.ca.items:
                 comment = field.ca.items[field_name][2].value
-            comment = comment.replace('#','')            
-            comment = comment.replace('\n','')
+            comment = comment.replace('#','').replace(' ', '').replace('\n','')            
             fields.append( dict(type=field[field_name], name=field_name, attr='', comment=comment) )
         
         # attribute proccess
@@ -107,9 +107,12 @@ def main(argv):
             index_str = index_template.render(entity_name=entity_name, index=entity['index'])
             index_list.append(index_str)
 
+        entity_comment = ''
+        if type(doc.ca.items[entity_name][2]) is ruamel.yaml.CommentToken:
+            entity_comment = doc.ca.items[entity_name][2].value.replace('#', '').replace(' ', '').replace('\n','')
         if parent != '' and parent is not None:
-            entity_name += " : " + parent
-        entity_class_str = class_template.render(entity_name=entity_name, fields=fields)
+            entity_name += " : " + parent            
+        entity_class_str = class_template.render(entity_name=entity_name, entity_comment=entity_comment,fields=fields)
         entity_list.append(entity_class_str)
 
     entity_all_str = entity_template.render(entities=entity_list)
