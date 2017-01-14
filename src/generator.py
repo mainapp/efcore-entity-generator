@@ -37,6 +37,8 @@ def main(argv):
 
     try:
       opts, args = getopt.getopt(argv,"hi:")
+      if opts == [] and args == [] :
+          raise getopt.GetoptError('')
     except getopt.GetoptError:
       print('generator.py -i <inputfile>')
       sys.exit(2)
@@ -127,7 +129,7 @@ def main(argv):
     ctx_file.close()
     #print(ctx_all_str)
 
-print("OK")
+    print("OK")
     
 
 
