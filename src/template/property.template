@@ -1,0 +1,2 @@
+builder.Entity<{{entity_name}}>()
+                .Property<{{property_type}}>("{{property_name}}");

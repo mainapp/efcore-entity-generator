@@ -1,36 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.DotNet.ProjectModel.Resolution;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Z.EntityFramework.Plus;
+// using Z.EntityFramework.Plus;
 
 namespace MyNamespace
 {
     public partial class MyDbContext
     {
-        private const string MySqlConnString = @"Server=192.168.1.60;Port=13306;Database=testdb;Uid=root;Pwd=wabjtam;Charset=utf8;";
-
-        public MyDbContext()
+        public MyDbContext(DbContextOptions<MyDbContext> options) : base(options)
         {
-        }
-
-        public MyDbContext(DbContextOptions options)
-                    : base(options)
-        {
-        }
-
-        public MyDbContext(DbContextOptions options) : base(options)
-        {
-            AuditManager.DefaultConfiguration.AutoSavePreAction = (context, audit) =>                
-                ((MyDbContext)context).AuditEntries.AddRange(audit.Entries);
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseMySQL(MySqlConnString);
+            // if using Z.EntityFramework.Plus 
+            // AuditManager.DefaultConfiguration.AutoSavePreAction = (context, audit) =>
+            //    ((MyDbContext)context).AuditEntries.AddRange(audit.Entries);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -43,8 +24,16 @@ namespace MyNamespace
             {% for rel in rels %}
             {{rel}}
             {% endfor %}
+
+            {% for property in properties %}
+            {{property}}
+            {% endfor %}
         }
 
+
+        // if using Z.EntityFramework.Plus 
+        // public DbSet<AuditEntry> AuditEntries { get; set; }
+        // public DbSet<AuditEntryProperty> AuditEntryProperties { get; set; }    
 
         {% for entity in entities %}
         public DbSet<{{entity}}> {{entity}}s { get; set; }
@@ -52,17 +41,4 @@ namespace MyNamespace
 
     }
 
-    public static class MyDbContextFactory
-    {
-        public static MyDbContext Create()
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<MyDbContext>();
-            optionsBuilder.UseMySQL(MySqlConnString);
-
-            var context = new MyDbContext(optionsBuilder.Options);
-            context.Database.EnsureCreated();
-
-            return context;
-        }
-    }    
 }

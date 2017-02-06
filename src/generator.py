@@ -16,6 +16,7 @@ entity_template = env.get_template('entities.template')
 many_template = env.get_template('many.template')
 index_template = env.get_template('index.template')
 dbctx_template = env.get_template('dbcontext.template')
+property_template = env.get_template('property.template')
 
 doc = {}
 
@@ -34,9 +35,10 @@ def entity_hasmany(entity_name, rel_name):
 
 
 def main(argv): 
+    is_print = False
 
     try:
-      opts, args = getopt.getopt(argv,"hi:")
+      opts, args = getopt.getopt(argv,"hpi:")
       if opts == [] and args == [] :
           raise getopt.GetoptError('')
     except getopt.GetoptError:
@@ -44,11 +46,13 @@ def main(argv):
       sys.exit(2)
 
     for opt, arg in opts:
-        if opt == '-h':
+        if opt == '-h':            
             print('generator.py -i <inputfile>')
             sys.exit()
         elif opt in ("-i"):
-            inputfile = arg      
+            inputfile = arg
+        if opt in ("-p"):
+            is_print = True
 
     fo = open(inputfile, 'r', encoding='utf-8')
     doc = ruamel.yaml.load(fo, ruamel.yaml.RoundTripLoader)
@@ -57,6 +61,7 @@ def main(argv):
     foreign_list = []
     index_list = []
     entity_name_list = []
+    property_list = []
 
     for entity_name in list(doc):
         entity_name_list.append(entity_name)
@@ -109,6 +114,12 @@ def main(argv):
             index_str = index_template.render(entity_name=entity_name, index=entity['index'])
             index_list.append(index_str)
 
+        #property proccess
+        if 'properties' in entity:
+            for property_name in entity['properties']:
+                property_str = property_template.render(entity_name=entity_name, property_type=entity['properties'][property_name], property_name=property_name)
+                property_list.append(property_str)
+
         entity_comment = ''
         if type(doc.ca.items[entity_name][2]) is ruamel.yaml.CommentToken:
             entity_comment = doc.ca.items[entity_name][2].value.replace('#', '').replace(' ', '').replace('\n','')
@@ -121,15 +132,19 @@ def main(argv):
     entity_file = open('MyEntities.cs', 'w', encoding='utf-8')
     entity_file.write(entity_all_str)
     entity_file.close()
-    #print(entity_all_str)
+    if is_print:
+        print(entity_all_str)
 
-    ctx_all_str = dbctx_template.render(rels=foreign_list, index=index_list, entities=entity_name_list)
+    ctx_all_str = dbctx_template.render(rels=foreign_list, index=index_list, entities=entity_name_list, properties=property_list)
     ctx_file = open('MyDbContext.cs', 'w', encoding='utf-8')
     ctx_file.write(ctx_all_str)
     ctx_file.close()
-    #print(ctx_all_str)
+    if is_print:
+        print(ctx_all_str)
 
-    print("OK")
+    if not is_print:
+        print(" -------    OK    ------")
+        print(" ------- 恭喜发财 ------")
     
 
 
