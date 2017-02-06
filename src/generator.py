@@ -1,4 +1,4 @@
-import sys, getopt, re #, yaml
+import sys, getopt, os, re #, yaml
 from jinja2 import Environment, FileSystemLoader
 import ruamel.yaml
 
@@ -36,9 +36,11 @@ def entity_hasmany(entity_name, rel_name):
 
 def main(argv): 
     is_print = False
+    ctx_name = ''
+    namespace = ''
 
     try:
-      opts, args = getopt.getopt(argv,"hpi:")
+      opts, args = getopt.getopt(argv,"hpn:c:e:i:")
       if opts == [] and args == [] :
           raise getopt.GetoptError('')
     except getopt.GetoptError:
@@ -53,6 +55,18 @@ def main(argv):
             inputfile = arg
         if opt in ("-p"):
             is_print = True
+        if opt in ("-n"):
+            namespace = arg
+        if opt in ("-c"):
+            ctx_name = arg
+        if opt in ("-e"):
+            ent_name = arg
+
+    if ctx_name == '' or namespace == '':
+        basename = os.path.basename(inputfile)
+        namespace = os.path.splitext(basename)[0]
+        ctx_name = namespace
+
 
     fo = open(inputfile, 'r', encoding='utf-8')
     doc = ruamel.yaml.load(fo, ruamel.yaml.RoundTripLoader)
@@ -121,22 +135,25 @@ def main(argv):
                 property_list.append(property_str)
 
         entity_comment = ''
+        entity_attr = ''
         if type(doc.ca.items[entity_name][2]) is ruamel.yaml.CommentToken:
             entity_comment = doc.ca.items[entity_name][2].value.replace('#', '').replace(' ', '').replace('\n','')
         if parent != '' and parent is not None:
-            entity_name += " : " + parent            
-        entity_class_str = class_template.render(entity_name=entity_name, entity_comment=entity_comment,fields=fields)
+            entity_name += " : " + parent
+        if 'classattr' in entity:
+            entity_attr = entity['classattr']
+        entity_class_str = class_template.render(entity_attr=entity_attr, entity_name=entity_name, entity_comment=entity_comment,fields=fields)
         entity_list.append(entity_class_str)
 
-    entity_all_str = entity_template.render(entities=entity_list)
-    entity_file = open('MyEntities.cs', 'w', encoding='utf-8')
+    entity_all_str = entity_template.render(namespace=namespace, entities=entity_list)
+    entity_file = open(ctx_name + 'Entities.cs', 'w', encoding='utf-8')
     entity_file.write(entity_all_str)
     entity_file.close()
     if is_print:
         print(entity_all_str)
 
-    ctx_all_str = dbctx_template.render(rels=foreign_list, index=index_list, entities=entity_name_list, properties=property_list)
-    ctx_file = open('MyDbContext.cs', 'w', encoding='utf-8')
+    ctx_all_str = dbctx_template.render(namespace=namespace, ctx=ctx_name, rels=foreign_list, index=index_list, entities=entity_name_list, properties=property_list)
+    ctx_file = open(ctx_name + 'DbContext.cs', 'w', encoding='utf-8')
     ctx_file.write(ctx_all_str)
     ctx_file.close()
     if is_print:

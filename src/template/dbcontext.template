@@ -3,15 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 // using Z.EntityFramework.Plus;
 
-namespace MyNamespace
+namespace {{namespace}}
 {
-    public partial class MyDbContext
+    public partial class {{ctx}}DbContext
     {
-        public MyDbContext(DbContextOptions<MyDbContext> options) : base(options)
+        public {{ctx}}DbContext(DbContextOptions<{{ctx}}DbContext> options) : base(options)
         {
             // if using Z.EntityFramework.Plus 
             // AuditManager.DefaultConfiguration.AutoSavePreAction = (context, audit) =>
-            //    ((MyDbContext)context).AuditEntries.AddRange(audit.Entries);
+            //    (({{ctx}}DbContext)context).AuditEntries.AddRange(audit.Entries);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
