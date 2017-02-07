@@ -6,4 +6,4 @@ builder.Entity<{{entity_name}}>()
                 .WithMany()
                 {%- endif %}
                 .HasForeignKey(p => p.{{has_foreign_id}})
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.{{delete_type}});

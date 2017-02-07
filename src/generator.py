@@ -78,8 +78,8 @@ def main(argv):
     property_list = []
 
     for entity_name in list(doc):
-        entity_name_list.append(entity_name)
         entity = doc[entity_name]
+        entity_name_list.append(entity_name)        
         
         field = []
         if 'fields' in entity:
@@ -117,10 +117,14 @@ def main(argv):
             for fk in foreign:
                 with_many = None
                 if fk is not None:
-                    result = re.findall('[A-z,0-9]+', foreign[fk])
+                    result = re.findall('[A-z,0-9]+', foreign[fk]['Rel'])
                     if len(result) == 3:
-                        with_many = result[2]
-                    many_rel_str = many_template.render(entity_name=entity_name, has_foreign=fk, has_foreign_id=result[0], with_many=with_many)
+                        with_many = result[2]                    
+                    if 'Type' in foreign[fk]:
+                        delete_type = foreign[fk]['Type']
+                    else:
+                        delete_type = 'Cascade'
+                    many_rel_str = many_template.render(entity_name=entity_name, has_foreign=fk, has_foreign_id=result[0], with_many=with_many, delete_type=delete_type)
                     foreign_list.append(many_rel_str)
 
         #index proccess
@@ -152,6 +156,10 @@ def main(argv):
     if is_print:
         print(entity_all_str)
 
+    # remove abstract entity
+    for entity_name in entity_name_list:
+        if 'abstract' in doc[entity_name]:
+            entity_name_list.remove(entity_name)
     ctx_all_str = dbctx_template.render(namespace=namespace, ctx=ctx_name, rels=foreign_list, index=index_list, entities=entity_name_list, properties=property_list)
     ctx_file = open(ctx_name + 'DbContext.cs', 'w', encoding='utf-8')
     ctx_file.write(ctx_all_str)
