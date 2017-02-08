@@ -117,11 +117,11 @@ def main(argv):
             for fk in foreign:
                 with_many = None
                 if fk is not None:
-                    result = re.findall('[A-z,0-9]+', foreign[fk]['Rel'])
+                    result = re.findall('[A-z,0-9]+', foreign[fk]['rel'])
                     if len(result) == 3:
                         with_many = result[2]                    
-                    if 'Type' in foreign[fk]:
-                        delete_type = foreign[fk]['Type']
+                    if 'type' in foreign[fk]:
+                        delete_type = foreign[fk]['type']
                     else:
                         delete_type = 'Cascade'
                     many_rel_str = many_template.render(entity_name=entity_name, has_foreign=fk, has_foreign_id=result[0], with_many=with_many, delete_type=delete_type)
