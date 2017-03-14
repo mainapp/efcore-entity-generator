@@ -157,8 +157,8 @@ def main(argv):
         print(entity_all_str)
 
     # remove abstract entity
-    for entity_name in entity_name_list:
-        if 'abstract' in doc[entity_name]:
+    for entity_name in entity_name_list[:]:        
+        if 'abstract' in doc[entity_name]:            
             entity_name_list.remove(entity_name)
     ctx_all_str = dbctx_template.render(namespace=namespace, ctx=ctx_name, rels=foreign_list, index=index_list, entities=entity_name_list, properties=property_list)
     ctx_file = open(ctx_name + 'DbContext.cs', 'w', encoding='utf-8')

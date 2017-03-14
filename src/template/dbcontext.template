@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+// using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 // using Z.EntityFramework.Plus;
 
 namespace {{namespace}}
 {
-    public partial class {{ctx}}DbContext
+    public partial class {{ctx}}DbContext : DbContext
     {
         public {{ctx}}DbContext(DbContextOptions<{{ctx}}DbContext> options) : base(options)
         {
